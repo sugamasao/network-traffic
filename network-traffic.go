@@ -16,14 +16,14 @@ type NetworkInformation struct {
 }
 
 func main() {
-	ifName := ""
+	var ifName string = ""
 	if len(os.Args) > 1 {
 		ifName = os.Args[1]
 	}
 
-	baseStats := getNetworkStat(ifName)
+	var baseStats map[string]NetworkInformation = getNetworkStat(ifName)
 	for {
-		nowStats := getNetworkStat(ifName)
+		var nowStats map[string]NetworkInformation = getNetworkStat(ifName)
 		for k, v := range nowStats {
 			in_diff := v.InBytes - baseStats[k].InBytes
 			out_diff := v.OutBytes - baseStats[k].OutBytes
@@ -35,8 +35,8 @@ func main() {
 }
 
 func execCommand(ifName string) string {
-	command := "netstat"
-	options := []string{"-bni"}
+	var command string = "netstat"
+	var options []string = []string{"-bni"}
 	if ifName != "" {
 		options = append(options, "-I", ifName)
 	}
@@ -50,9 +50,9 @@ func execCommand(ifName string) string {
 }
 
 func getNetworkStat(ifName string) map[string]NetworkInformation {
-	result := make(map[string]NetworkInformation)
-	rowStat := execCommand(ifName)
-	rowStatLine := strings.Split(rowStat, "\n")
+	var result map[string]NetworkInformation = make(map[string]NetworkInformation)
+	var rowStat string = execCommand(ifName)
+	var rowStatLine []string = strings.Split(rowStat, "\n")
 
 	for i := range rowStatLine {
 		if i == 0 { // header.
@@ -62,7 +62,7 @@ func getNetworkStat(ifName string) map[string]NetworkInformation {
 			continue
 		}
 
-		fields := strings.Fields(string(rowStatLine[i]))
+		var fields []string = strings.Fields(string(rowStatLine[i]))
 		if regexp.MustCompile(`^<Link#\d+>$`).Match([]byte(fields[2])) {
 			in, _ := strconv.Atoi(fields[6])
 			out, _ := strconv.Atoi(fields[9])
